@@ -1,6 +1,9 @@
 package org.servalproject.svd.camerasimple;
 
 import java.io.IOException;
+import java.sql.Timestamp;
+import java.util.Calendar;
+import java.util.Date;
 
 import android.app.Activity;
 import android.content.pm.ActivityInfo;
@@ -21,9 +24,10 @@ public class VideoCaptureActivity extends Activity implements OnClickListener,
 	MediaRecorder recorder;
 	SurfaceHolder holder;
 
-	boolean recording = false;
+	private boolean recording = false;
 	public static final String TAG = "SPCA";
-	private static final String PATH = "/sdcard/video.mp4";
+	private static final String BASE_PATH = "/sdcard/";
+	private static final String BASE_NAME = "video";
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -51,7 +55,7 @@ public class VideoCaptureActivity extends Activity implements OnClickListener,
 		// Clickable and loopback to the class listener
 		cameraView.setClickable(true);
 		cameraView.setOnClickListener(this);
-		
+
 		// Define as the event listener for max duration
 		recorder.setOnInfoListener(this);
 	}
@@ -67,10 +71,24 @@ public class VideoCaptureActivity extends Activity implements OnClickListener,
 		CamcorderProfile highProfile = CamcorderProfile
 				.get(CamcorderProfile.QUALITY_HIGH);
 		recorder.setProfile(highProfile);
-		recorder.setOutputFile(PATH);
+		recorder.setOutputFile(createFilePath());
 
-		// Lenght max 
+		// Lenght max
 		recorder.setMaxDuration(10000); // Set max duration 60 sec.
+	}
+
+	/**
+	 * Generate a name for the file including the current date, and based on the
+	 * {@link VideoCaptureActivity#BASE_PATH} and the base name
+	 * {@link VideoCaptureActivity#BASE_NAME}
+	 * 
+	 * @return the path
+	 */
+	private String createFilePath() {
+		Calendar calendar = Calendar.getInstance();
+		Date now = calendar.getTime();
+		Timestamp ts = new Timestamp(now.getTime());
+		return new String(BASE_PATH + BASE_NAME + "-" + ts.getTime() + ".mp4");
 	}
 
 	private void prepareRecorder() {
@@ -137,6 +155,8 @@ public class VideoCaptureActivity extends Activity implements OnClickListener,
 	public void onInfo(MediaRecorder mediaRecorder, int what, int extra) {
 		if (what == MediaRecorder.MEDIA_RECORDER_INFO_MAX_DURATION_REACHED) {
 			Log.v(TAG, "Max duration reached !");
+			recorder.stop();
+			recording = false;
 		}
 	}
 
