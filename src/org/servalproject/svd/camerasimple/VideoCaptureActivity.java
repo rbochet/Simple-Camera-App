@@ -22,9 +22,12 @@ public class VideoCaptureActivity extends Activity implements OnClickListener,
 	SurfaceHolder holder;
 
 	private boolean recording = false;
+
 	public static final String TAG = "SPCA";
 	private static final String BASE_PATH = "/sdcard/";
 	private static final String BASE_NAME = "video";
+
+	private static final int CHUNK_SIZE = 10000;
 
 	private int currentChunkId = 0;
 
@@ -77,8 +80,8 @@ public class VideoCaptureActivity extends Activity implements OnClickListener,
 		Log.v(TAG, "Chunk #" + (currentChunkId - 1) + "(" + fileName
 				+ ") prepared");
 
-		// Lenght max
-		recorder.setMaxDuration(10000); // Set max duration 60 sec.
+		// Set max duration
+		recorder.setMaxDuration(CHUNK_SIZE); 
 	}
 
 	/**
