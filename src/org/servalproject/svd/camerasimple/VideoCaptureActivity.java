@@ -1,9 +1,6 @@
 package org.servalproject.svd.camerasimple;
 
 import java.io.IOException;
-import java.sql.Timestamp;
-import java.util.Calendar;
-import java.util.Date;
 
 import android.app.Activity;
 import android.content.pm.ActivityInfo;
@@ -28,6 +25,8 @@ public class VideoCaptureActivity extends Activity implements OnClickListener,
 	public static final String TAG = "SPCA";
 	private static final String BASE_PATH = "/sdcard/";
 	private static final String BASE_NAME = "video";
+
+	private int currentChunkId = 0;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -78,17 +77,14 @@ public class VideoCaptureActivity extends Activity implements OnClickListener,
 	}
 
 	/**
-	 * Generate a name for the file including the current date, and based on the
-	 * {@link VideoCaptureActivity#BASE_PATH} and the base name
+	 * Generate a name for the file including the current chunk id, and based on
+	 * the {@link VideoCaptureActivity#BASE_PATH} and the base name
 	 * {@link VideoCaptureActivity#BASE_NAME}
 	 * 
 	 * @return the path
 	 */
 	private String createFilePath() {
-		Calendar calendar = Calendar.getInstance();
-		Date now = calendar.getTime();
-		Timestamp ts = new Timestamp(now.getTime());
-		return new String(BASE_PATH + BASE_NAME + "-" + ts.getTime() + ".mp4");
+		return new String(BASE_PATH + BASE_NAME + "-" + currentChunkId + ".mp4");
 	}
 
 	private void prepareRecorder() {
