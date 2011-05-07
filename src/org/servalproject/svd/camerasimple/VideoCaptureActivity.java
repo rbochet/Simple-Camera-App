@@ -23,7 +23,7 @@ public class VideoCaptureActivity extends Activity implements OnClickListener,
 
 	boolean recording = false;
 	public static final String TAG = "SPCA";
-	private static final String PATH = "/sdcard/fuckingvideo.mp4";
+	private static final String PATH = "/sdcard/video.mp4";
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -60,19 +60,21 @@ public class VideoCaptureActivity extends Activity implements OnClickListener,
 		// Sources
 		recorder.setAudioSource(MediaRecorder.AudioSource.DEFAULT);
 		recorder.setVideoSource(MediaRecorder.VideoSource.DEFAULT);
-
 		// HD
 		CamcorderProfile highProfile = CamcorderProfile
 				.get(CamcorderProfile.QUALITY_HIGH);
 		recorder.setProfile(highProfile);
 		recorder.setOutputFile(PATH);
+
+		// Lenght max 
+		recorder.setMaxDuration(10000); // Set max duration 60 sec.
 	}
 
 	private void prepareRecorder() {
 		recorder.setPreviewDisplay(holder.getSurface());
 		try {
 			recorder.prepare();
-			Log.v(TAG, "Recording Started");
+			Log.v(TAG, "Prepare finished");
 		} catch (IllegalStateException e) {
 			e.printStackTrace();
 			yellInPain();
@@ -90,6 +92,7 @@ public class VideoCaptureActivity extends Activity implements OnClickListener,
 	public void onClick(View v) {
 		if (recording) { // Switch off
 			recorder.stop();
+			recorder.reset();
 			recorder.release();
 			recording = false;
 			Log.v(TAG, "Recording Stopped");
