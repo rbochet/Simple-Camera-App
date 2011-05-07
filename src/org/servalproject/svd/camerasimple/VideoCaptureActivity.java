@@ -70,7 +70,12 @@ public class VideoCaptureActivity extends Activity implements OnClickListener,
 		CamcorderProfile highProfile = CamcorderProfile
 				.get(CamcorderProfile.QUALITY_HIGH);
 		recorder.setProfile(highProfile);
-		recorder.setOutputFile(createFilePath());
+
+		// Set the name of the current chunk
+		String fileName = createFilePath();
+		recorder.setOutputFile(fileName);
+		Log.v(TAG, "Chunk #" + (currentChunkId - 1) + "(" + fileName
+				+ ") prepared");
 
 		// Lenght max
 		recorder.setMaxDuration(10000); // Set max duration 60 sec.
@@ -110,7 +115,6 @@ public class VideoCaptureActivity extends Activity implements OnClickListener,
 	public void onClick(View v) {
 		if (recording) { // Switch off
 			recorder.stop();
-			recorder.reset();
 			recorder.release();
 			recording = false;
 			Log.v(TAG, "Recording Stopped");
@@ -153,8 +157,9 @@ public class VideoCaptureActivity extends Activity implements OnClickListener,
 		if (what == MediaRecorder.MEDIA_RECORDER_INFO_MAX_DURATION_REACHED) {
 			Log.v(TAG, "Max duration reached !");
 			recorder.stop();
-			recording = false;
-
+			initRecorder();
+			prepareRecorder();
+			recorder.start();
 		} else {
 			Log.e(TAG, "Media Recorder sent an unknown event... Not good.");
 		}
