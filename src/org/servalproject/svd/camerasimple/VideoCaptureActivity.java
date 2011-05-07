@@ -157,6 +157,8 @@ public class VideoCaptureActivity extends Activity implements OnClickListener,
 			Log.v(TAG, "Max duration reached !");
 			recorder.stop();
 			recording = false;
+		} else {
+			Log.e(TAG, "Media Recorder sent an unknown event... Not good.");
 		}
 	}
 
