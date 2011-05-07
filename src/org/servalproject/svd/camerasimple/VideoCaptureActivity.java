@@ -161,6 +161,11 @@ public class VideoCaptureActivity extends Activity implements OnClickListener,
 		if (what == MediaRecorder.MEDIA_RECORDER_INFO_MAX_DURATION_REACHED) {
 			Log.v(TAG, "Max duration reached !");
 			recorder.stop();
+			
+			// Send the chunk
+			new ChunkSender(createFilePath(currentChunkId)).start();
+			
+			// Restart the procedure
 			initRecorder();
 			prepareRecorder();
 			recorder.start();

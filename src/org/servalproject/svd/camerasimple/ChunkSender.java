@@ -31,7 +31,7 @@ public class ChunkSender extends Thread {
 	/**
 	 * Server where the stream will be send
 	 */
-	private static final String SERVER = null;
+	private static final String SERVER = "192.168.1.7";
 
 	/**
 	 * Size of the buffer for the transfer
@@ -53,19 +53,21 @@ public class ChunkSender extends Thread {
 
 	@Override
 	public void run() {
+		BufferedOutputStream outputStream;
+		BufferedInputStream inputStream;
 		try {
 			// Connect to the server
-			Socket socketRcv = new Socket(ChunkSender.SERVER,
+			Socket socket = new Socket(ChunkSender.SERVER,
 					ChunkSender.REMOTE_PORT);
-			Log.i(TAG, "Remote socket connected " + socketRcv);
+			Log.i(TAG, "Remote socket connected " + socket);
 
 			// Read the chunk in binary mode
-			DataInputStream inputStream = new DataInputStream(
-					new BufferedInputStream(new FileInputStream(chunkPath)));
+			inputStream = new BufferedInputStream(
+					new FileInputStream(chunkPath));
 
 			// Write the socket in binary mode
-			BufferedOutputStream outputStream = new BufferedOutputStream(
-					socketRcv.getOutputStream(), ChunkSender.BUFFER_SIZE);
+			outputStream = new BufferedOutputStream(socket.getOutputStream(),
+					ChunkSender.BUFFER_SIZE);
 
 			Log.v(TAG, "I/O streams set up.");
 
@@ -73,24 +75,34 @@ public class ChunkSender extends Thread {
 			byte[] buffer = new byte[BUFFER_SIZE];
 
 			while (true) {
-				inputStream.read(buffer);
-				outputStream.write(buffer);
-				Log.v(TAG, "Write " + ChunkSender.BUFFER_SIZE * i + "bytes ("
-						+ i + "packets)");
-				i++;
+				try {
+					if (inputStream.available() > BUFFER_SIZE) {
+						inputStream.read(buffer);
+						outputStream.write(buffer);
+						Log.v(TAG, "Write " + ChunkSender.BUFFER_SIZE * i
+								+ "bytes (" + i + "packets)");
+						i++;
+					} else {
+						outputStream.write(inputStream.read());
+					}
+				} finally {
+					// Close the streams
+					socket.close();
+					inputStream.close();
+					outputStream.close();
+					Log.v(TAG, "Streams & socket closed.");
+				}
 			}
 		} catch (UnknownHostException e) {
 			Log.e(TAG, "The server " + ChunkSender.SERVER + ":"
 					+ ChunkSender.REMOTE_PORT + " is not up.");
 			e.printStackTrace();
 		} catch (FileNotFoundException e) {
-			Log.e(TAG, "The chunk ("+chunkPath+") does not exist.");
+			Log.e(TAG, "The chunk (" + chunkPath + ") does not exist.");
 			e.printStackTrace();
 		} catch (IOException e) {
 			Log.e(TAG, "I/O exception in the ChunkSender");
 			e.printStackTrace();
 		}
-
 	}
-
 }
