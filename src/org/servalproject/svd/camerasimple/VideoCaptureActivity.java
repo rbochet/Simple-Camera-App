@@ -75,13 +75,13 @@ public class VideoCaptureActivity extends Activity implements OnClickListener,
 		recorder.setProfile(highProfile);
 
 		// Set the name of the current chunk
-		String fileName = createFilePath();
+		String fileName = createFilePath(currentChunkId++);
 		recorder.setOutputFile(fileName);
 		Log.v(TAG, "Chunk #" + (currentChunkId - 1) + "(" + fileName
 				+ ") prepared");
 
 		// Set max duration
-		recorder.setMaxDuration(CHUNK_SIZE); 
+		recorder.setMaxDuration(CHUNK_SIZE);
 	}
 
 	/**
@@ -89,11 +89,12 @@ public class VideoCaptureActivity extends Activity implements OnClickListener,
 	 * the {@link VideoCaptureActivity#BASE_PATH} and the base name
 	 * {@link VideoCaptureActivity#BASE_NAME}
 	 * 
+	 * @param id
+	 *            The chunk id
 	 * @return the path
 	 */
-	private String createFilePath() {
-		return new String(BASE_PATH + BASE_NAME + "-" + currentChunkId++
-				+ ".mp4");
+	private String createFilePath(int id) {
+		return new String(BASE_PATH + BASE_NAME + "-" + id + ".mp4");
 	}
 
 	private void prepareRecorder() {
