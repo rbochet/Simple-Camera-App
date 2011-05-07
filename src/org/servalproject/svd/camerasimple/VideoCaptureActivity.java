@@ -16,7 +16,7 @@ import android.view.Window;
 import android.view.WindowManager;
 
 public class VideoCaptureActivity extends Activity implements OnClickListener,
-		SurfaceHolder.Callback {
+		SurfaceHolder.Callback, MediaRecorder.OnInfoListener {
 
 	MediaRecorder recorder;
 	SurfaceHolder holder;
@@ -51,6 +51,9 @@ public class VideoCaptureActivity extends Activity implements OnClickListener,
 		// Clickable and loopback to the class listener
 		cameraView.setClickable(true);
 		cameraView.setOnClickListener(this);
+		
+		// Define as the event listener for max duration
+		recorder.setOnInfoListener(this);
 	}
 
 	/**
@@ -128,6 +131,13 @@ public class VideoCaptureActivity extends Activity implements OnClickListener,
 	private void yellInPain() {
 		Log.e(TAG, "Quitting cause something is WRONG!");
 		finish();
+	}
+
+	@Override
+	public void onInfo(MediaRecorder mediaRecorder, int what, int extra) {
+		if (what == MediaRecorder.MEDIA_RECORDER_INFO_MAX_DURATION_REACHED) {
+			Log.v(TAG, "Max duration reached !");
+		}
 	}
 
 }
