@@ -84,7 +84,8 @@ public class VideoCaptureActivity extends Activity implements OnClickListener,
 	 * @return the path
 	 */
 	private String createFilePath() {
-		return new String(BASE_PATH + BASE_NAME + "-" + currentChunkId + ".mp4");
+		return new String(BASE_PATH + BASE_NAME + "-" + currentChunkId++
+				+ ".mp4");
 	}
 
 	private void prepareRecorder() {
@@ -153,6 +154,7 @@ public class VideoCaptureActivity extends Activity implements OnClickListener,
 			Log.v(TAG, "Max duration reached !");
 			recorder.stop();
 			recording = false;
+
 		} else {
 			Log.e(TAG, "Media Recorder sent an unknown event... Not good.");
 		}
