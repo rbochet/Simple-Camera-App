@@ -163,12 +163,12 @@ public class VideoCaptureActivity extends Activity implements OnClickListener,
 			recorder.stop();
 			
 			// Send the chunk
-			new ChunkSender(createFilePath(currentChunkId)).start();
+			new ChunkSender(createFilePath(currentChunkId-1)).start();
 			
 			// Restart the procedure
-			initRecorder();
+			/*initRecorder();
 			prepareRecorder();
-			recorder.start();
+			recorder.start(); */
 		} else {
 			Log.e(TAG, "Media Recorder sent an unknown event... Not good.");
 		}

@@ -2,10 +2,11 @@ package org.servalproject.svd.camerasimple;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.DataInputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
@@ -59,11 +60,12 @@ public class ChunkSender extends Thread {
 			// Connect to the server
 			Socket socket = new Socket(ChunkSender.SERVER,
 					ChunkSender.REMOTE_PORT);
-			Log.i(TAG, "Remote socket connected " + socket);
+			Log.v(TAG, "Remote socket connected " + socket);
 
 			// Read the chunk in binary mode
+			File chunkFile = new File(chunkPath);
 			inputStream = new BufferedInputStream(
-					new FileInputStream(chunkPath));
+					new FileInputStream(chunkFile));
 
 			// Write the socket in binary mode
 			outputStream = new BufferedOutputStream(socket.getOutputStream(),
@@ -71,28 +73,19 @@ public class ChunkSender extends Thread {
 
 			Log.v(TAG, "I/O streams set up.");
 
-			int i = 0;
-			byte[] buffer = new byte[BUFFER_SIZE];
+			byte[] fileBytesArray = new byte[(int) chunkFile.length()];
+			
+			Log.d(TAG, "Local bytes array created: " + (int) chunkFile.length()
+					+ "bytes");
+			
+			inputStream.read(fileBytesArray, 0, fileBytesArray.length);
+			outputStream.write(fileBytesArray, 0, fileBytesArray.length);
+			Log.d(TAG, "Write done");
+			outputStream.flush();
+			socket.close();
 
-			while (true) {
-				try {
-					if (inputStream.available() > BUFFER_SIZE) {
-						inputStream.read(buffer);
-						outputStream.write(buffer);
-						Log.v(TAG, "Write " + ChunkSender.BUFFER_SIZE * i
-								+ "bytes (" + i + "packets)");
-						i++;
-					} else {
-						outputStream.write(inputStream.read());
-					}
-				} finally {
-					// Close the streams
-					socket.close();
-					inputStream.close();
-					outputStream.close();
-					Log.v(TAG, "Streams & socket closed.");
-				}
-			}
+			Log.v(TAG, chunkPath + "sent.");
+
 		} catch (UnknownHostException e) {
 			Log.e(TAG, "The server " + ChunkSender.SERVER + ":"
 					+ ChunkSender.REMOTE_PORT + " is not up.");
