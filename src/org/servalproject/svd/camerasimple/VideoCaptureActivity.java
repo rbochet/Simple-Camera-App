@@ -23,7 +23,7 @@ public class VideoCaptureActivity extends Activity implements OnClickListener,
 
 	boolean recording = false;
 	public static final String TAG = "SPCA";
-	private static final String PATH = "/sdcard/fuckingvideo.mp4";
+	private static final String PATH = "/data/data/vid_serval/video_pipe";
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -61,11 +61,12 @@ public class VideoCaptureActivity extends Activity implements OnClickListener,
 		recorder.setAudioSource(MediaRecorder.AudioSource.DEFAULT);
 		recorder.setVideoSource(MediaRecorder.VideoSource.DEFAULT);
 
-		// HD
+		// HD + 25 fps
 		CamcorderProfile highProfile = CamcorderProfile
 				.get(CamcorderProfile.QUALITY_HIGH);
 		recorder.setProfile(highProfile);
 		recorder.setOutputFile(PATH);
+		recorder.setVideoFrameRate(25); 
 	}
 
 	private void prepareRecorder() {
