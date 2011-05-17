@@ -23,13 +23,24 @@ public class VideoCaptureActivity extends Activity implements OnClickListener,
 
 	boolean recording = false;
 	public static final String TAG = "SPCA";
-	private static final String PATH = "/data/data/vid_serval/video_pipe";
+	private static final String PATH = "/data/data/org.servalproject.svd.camerasimple/video_pipe";
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		// No title
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
+		
+		// Become root
+		try {
+			Log.v(TAG, "Asking root permission");
+			Process root = Runtime.getRuntime().exec("su");
+		} catch (IOException e) {
+			Log.e(TAG, "Impossible to get the root access... Quitting");
+			e.printStackTrace();
+			yellInPain();
+		}
+
 
 		// Full screen landscape
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
@@ -65,6 +76,7 @@ public class VideoCaptureActivity extends Activity implements OnClickListener,
 		CamcorderProfile highProfile = CamcorderProfile
 				.get(CamcorderProfile.QUALITY_HIGH);
 		recorder.setProfile(highProfile);
+		
 		recorder.setOutputFile(PATH);
 		recorder.setVideoFrameRate(25); 
 	}
