@@ -1,12 +1,16 @@
 package org.servalproject.svd.camerasimple;
 
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.Socket;
+import java.net.UnknownHostException;
 
 import android.app.Activity;
 import android.content.pm.ActivityInfo;
 import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
 import android.os.Bundle;
+import android.os.ParcelFileDescriptor;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -22,8 +26,14 @@ public class VideoCaptureActivity extends Activity implements OnClickListener,
 	SurfaceHolder holder;
 
 	boolean recording = false;
+	/** TAG for the application Logcat */
 	public static final String TAG = "SPCA";
-	private static final String PATH = "/sdcard/fuckingvideo.mp4";
+
+	/** Host that will be targeted */
+	private static final String HOST = "192.168.1.8";
+
+	/** Port that will be targeted */
+	private static final int PORT = 1234;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -65,7 +75,18 @@ public class VideoCaptureActivity extends Activity implements OnClickListener,
 		CamcorderProfile highProfile = CamcorderProfile
 				.get(CamcorderProfile.QUALITY_HIGH);
 		recorder.setProfile(highProfile);
-		recorder.setOutputFile(PATH);
+
+		try {
+			Socket socket = new Socket(InetAddress.getByName(HOST), PORT);
+			ParcelFileDescriptor pfd = ParcelFileDescriptor.fromSocket(socket);
+			recorder.setOutputFile(pfd.getFileDescriptor());
+		} catch (UnknownHostException e) {
+			Log.e(TAG, "Unknown host description: " + HOST);
+			e.printStackTrace();
+		} catch (IOException e) {
+			Log.e(TAG, "IO failure.");
+			e.printStackTrace();
+		}
 	}
 
 	private void prepareRecorder() {
